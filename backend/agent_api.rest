@@ -1,0 +1,28 @@
+# VS Code REST Client requests for Agent API
+# Install extension: humao.rest-client
+
+@baseUrl = http://localhost:8000
+@userId = user_1
+@sessionId = s_mjb56utv
+
+### Health
+GET {{baseUrl}}/health
+
+### Chat: send a message (creates session if not provided)
+POST {{baseUrl}}/agent/chat
+Content-Type: application/json
+
+{
+  "session_id": "{{sessionId}}",
+  "user_id": "{{userId}}",
+  "message": "List all tables in the database."
+}
+
+### List sessions for a user
+GET {{baseUrl}}/agent/sessions?user_id={{userId}}
+
+### Get chat history for a session
+GET {{baseUrl}}/agent/history/{{sessionId}}
+
+### Delete a session (and all its history)
+DELETE {{baseUrl}}/agent/session/{{sessionId}}
