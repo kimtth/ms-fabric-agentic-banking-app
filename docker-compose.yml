@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"  # Backend + Frontend (served as static files)
+    environment:
+      # Backend environment variables
+      # Azure OpenAI (for Agent feature)
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_CHAT_DEPLOYMENT_NAME=${AZURE_OPENAI_CHAT_DEPLOYMENT_NAME:-gpt-4o-mini}
+      
+      # Fabric SQL connection string
+      # Format: Driver={ODBC Driver 18 for SQL Server};Server=<server>.database.fabric.microsoft.com,1433;Database=<db>;Encrypt=yes;TrustServerCertificate=no;Authentication=<auth-method>
+      - FABRIC_SQL_CONNECTION_STRING=${FABRIC_SQL_CONNECTION_STRING}
+      
+      - NODE_ENV=production
+      - PYTHONUNBUFFERED=1
+    
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

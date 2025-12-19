@@ -6,6 +6,7 @@
 - Refactored and simplified version of [Agentic Banking App with SQL in Fabric](https://github.com/Azure-Samples/sql-agentic-app-with-fabric).
 - Removed LangChain, Flask, RAG features, and Fabric Agent (commercial capacity required).
 - Focuses on core SQL patterns with simplified UI, data models, and Fabric artifacts.
+- This application works in local development.
 
 ## Architecture
 - **Frontend:** Next.js 16, React 18, TypeScript, Tailwind CSS
@@ -84,21 +85,41 @@ npm install
 
 ### 5. Running
 
-#### Backend
+#### Local Development (Separate Services)
 
+**Backend:**
 ```bash
 cd backend
+cp .env.sample .env # fill your values
 python -m uvicorn app.main:app --reload --port 8000
-# or
-python main.py
 ```
 
-#### Frontend
-
+**Frontend (in another terminal):**
 ```bash
 cd frontend
+cp .env.local.example .env.local
 npm run dev
 ```
+Access at `http://localhost:3000`
+
+#### Docker (optional)
+
+> Authentication=ActiveDirectoryInteractive does not work in Docker containers. Use a service principal or managed identity instead. The Dockerfile was tested only for building the image and has not been tested with the API using the other two authentication options.
+
+Frontend is served as static files from the FastAPI backend on port 8000.
+
+```bash
+# Build image
+docker build -t fabric-banking-app .
+
+# Run container
+docker run -d -p 8000:8000 --env-file .env fabric-banking-app
+
+# Or use Docker Compose
+docker-compose up --build
+```
+
+Access at `http://localhost:8000`
 
 ### 6. Power BI Report
 

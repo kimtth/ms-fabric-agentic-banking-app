@@ -1,0 +1,60 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README.md
+docs/
+AGENTs.MD
+
+# Python
+backend/__pycache__
+backend/**/__pycache__
+backend/.pytest_cache
+backend/**/.pytest_cache
+backend/*.pyc
+backend/**/*.pyc
+backend/.python-version
+backend/.env
+backend/.venv
+backend/venv
+
+# Node.js
+frontend/node_modules
+frontend/.next
+frontend/.turbo
+frontend/.env.local
+frontend/.env*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Fabric artifacts
+fabric_artifacts/
+notebooks/
+
+# Legacy files
+legacy/
+
+# Agent framework clone
+agent-framework-git-clone/
+
+# Test files
+backend/*.rest
+backend/demo_*.py

@@ -4,7 +4,9 @@ import uvicorn
 from datetime import datetime
 from typing import Optional
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
@@ -44,16 +46,17 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Fabric OLTP/OLTAP/OLAP + Agent API", lifespan=lifespan)
 
-origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
-if env_origin := os.getenv("FRONTEND_ORIGIN"):
-    origins.append(env_origin)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS only needed if frontend is on different domain
+if os.getenv("ENABLE_CORS", True):
+    origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+    if env_origin := os.getenv("FRONTEND_ORIGIN"):
+        origins.append(env_origin)
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 
 
@@ -255,6 +258,19 @@ def agent_delete_session(session_id: str):
         session.execute(text(sql.DELETE_CHAT_HISTORY_BY_SESSION), {"sid": session_id})
         session.execute(text(sql.DELETE_CHAT_SESSION), {"sid": session_id})
     return {"ok": True}
+
+
+# Serve static frontend from backend/static
+static_path = Path(__file__).parent / "static"
+if (static_path / "_next").exists():
+    app.mount("/_next", StaticFiles(directory=static_path / "_next"), name="next-static")
+
+@app.api_route("/{path:path}", methods=["GET", "HEAD"])
+async def serve_spa(path: str):
+    for p in [static_path / path, static_path / f"{path}.html", static_path / "index.html"]:
+        if p.is_file():
+            return FileResponse(p)
+    raise HTTPException(404)
 
 
 if __name__ == "__main__":

@@ -260,3 +260,5 @@ backend/.python-version
 /agent-framework-git-clone
 *.lock
 .vscode/settings.json
+/backend/static
+/frontend/out
